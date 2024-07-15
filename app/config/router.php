@@ -14,9 +14,8 @@ class router
     public static function dispatch()
     {
         $requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-        // Remove o prefixo '/api' do requestUri
         $apiPrefix = '/api';
-        if (substr($requestUri, 0, strlen($apiPrefix)) === $apiPrefix) {
+        if (str_starts_with($requestUri, $apiPrefix)) {
             $requestUri = substr($requestUri, strlen($apiPrefix));
         }
 
@@ -26,7 +25,7 @@ class router
             if ($route['path'] === $requestUri && strtolower($route['method']) === strtolower($requestMethod)) {
                 list($controllerName, $methodName) = explode('@', $route['action']);
 
-                $controllerClass = "App\\Http\\Controllers\\" . $controllerName;
+                $controllerClass = "App\\Controller\\" . $controllerName;
                 if (class_exists($controllerClass)) {
                     $controller = new $controllerClass();
                     if (method_exists($controller, $methodName)) {

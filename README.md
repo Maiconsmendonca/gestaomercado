@@ -75,3 +75,14 @@ Para parar os serviços, execute o seguinte comando:
 ```bash
 docker compose down
 ```
+
+### Migrando database
+
+Para executar o script setup_database.php, você pode usar a linha de comando ou um navegador, dependendo
+de como seu ambiente de desenvolvimento está configurado. Se estiver usando a linha de comando,
+navegue até o diretório do seu projeto e execute:
+
+```bash
+php setup_database.php
+```
+

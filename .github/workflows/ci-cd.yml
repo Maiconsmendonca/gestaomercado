@@ -1,0 +1,37 @@
+#name: CI/CD Workflow
+#
+#on:
+#  push:
+#    tags:
+#      - '*'
+#
+#jobs:
+#  build:
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      - uses: actions/checkout@v2
+#
+#      - name: Set up PHP
+#        uses: shivammathur/setup-php@v2
+#        with:
+#          php-version: '8.3'
+#          extensions: mbstring, xml
+#          coverage: none
+#
+#      - name: Install dependencies
+#        run: composer install --prefer-dist --no-progress --no-suggest
+#
+#      - name: Run tests
+#        run: ./vendor/bin/phpunit
+#
+#      - name: Check PSR-2 Compliance
+#        run: ./vendor/bin/phpcs --standard=PSR2 src/
+#
+#      - name: Deploy to Heroku
+#        if: success()
+#        uses: akhileshns/heroku-deploy@v3.12.12
+#        with:
+#          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+#          heroku_app_name: "your-heroku-app-name"
+#          heroku_email: "your-email@example.com"

@@ -1,8 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
-
-use function PHPUnit\Framework\exactly;
+namespace App\Controller;
 
 class TesteController
 {
