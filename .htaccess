@@ -1,0 +1,28 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Redireciona de www para não-www (opcional)
+    RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+    RewriteRule ^ http://%1%{REQUEST_URI} [R=301,L]
+
+    # Força HTTPS (opcional)
+    # RewriteCond %{HTTPS} off
+    # RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    # Não reescreve URLs para arquivos, diretórios ou links simbólicos existentes
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-l
+
+    # Redireciona todas as requisições para index.php, exceto arquivos estáticos
+    RewriteRule ^ index.php [L]
+
+    # Redireciona arquivos estáticos dentro de /public (opcional)
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(css|js|images)/(.*)$ public/$1/$2 [L,NC]
+</IfModule>
+
+# Configurações PHP (opcional)
+php_value post_max_size 800M
+php_value upload_max_filesize 500M
+php_value max_execution_time 3600

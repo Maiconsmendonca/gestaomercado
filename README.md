@@ -19,7 +19,7 @@ Certifique-se de ter os seguintes requisitos instalados na sua máquina:
    Clone este repositório para sua máquina local:
 
    ```bash
-   git clone https://github.com/seu-usuario/gestaomercado.git
+   git clone https://github.com/Maiconsmendonca/gestaomercado.git
    cd gestaomercado
     ```
 
@@ -57,14 +57,16 @@ Edite o arquivo `.env` para configurar as variáveis de ambiente conforme seu am
 Execute o seguinte comando dentro do container PHP para gerar a chave de aplicativo automaticamente:
 
 ```bash
-docker compose exec php php -r "require_once 'vendor/autoload.php'; use Dotenv\Dotenv; Dotenv::createImmutable(__DIR__)->load(); file_put_contents('.env', str_replace('APP_KEY=', 'APP_KEY=' . base64_encode(random_bytes(32)), file_get_contents('.env')));"
+php ./scripts/generate_key.php
 ```
 
 Este comando gera uma chave de 32 bytes e a adiciona automaticamente ao seu arquivo .env.
 
 ### Usando o Sistema
 
-Depois de configurar o ambiente conforme acima, você pode acessar o sistema através do navegador usando http://localhost.
+Depois de configurar o ambiente conforme acima,
+você pode acessar o sistema através do navegador usando:
+http://localhost.
 
 ### Parando os Serviços
 
