@@ -38,7 +38,7 @@ class Router
             $controllerName = "App\\" . $segments[0];
             $methodName = $segments[1];
 
-            require_once "api/{$segments[0]}.php";
+            require_once "app/{$segments[0]}.php";
 
             $controller = new $controllerName();
             $controller->$methodName();
