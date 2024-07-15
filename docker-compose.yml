@@ -1,13 +1,10 @@
-version: '3.8'
-
 services:
   php:
     build:
-      context: ./php
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: php/Dockerfile  # Caminho para o Dockerfile dentro da pasta 'php'
     volumes:
-      - ./app:/var/www/html
-      - ./php/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
+      - ./app:/var/www/html  # Mapeia o código-fonte da aplicação
     networks:
       - app-network
 
@@ -16,8 +13,8 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./app:/var/www/html
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./app:/var/www/html  # Mapeia o código-fonte da aplicação
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf  # Configuração do NGINX
     depends_on:
       - php
     networks:
@@ -27,7 +24,7 @@ services:
     image: mysql:8.0
     command: --default-authentication-plugin=mysql_native_password
     volumes:
-      - mysql-data:/var/lib/mysql
+      - mysql-data:/var/lib/mysql  # Volume para dados do MySQL
     environment:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_PASSWORD=root
@@ -40,12 +37,12 @@ services:
     image: node:latest
     working_dir: /var/www/html
     volumes:
-      - ./app:/var/www/html
+      - ./app:/var/www/html  # Mapeia o código-fonte da aplicação
     networks:
       - app-network
 
 volumes:
-  mysql-data:
+  mysql-data:  # Define o volume persistente para o MySQL
 
 networks:
-  app-network:
+  app-network:  # Define a rede personalizada para os serviços

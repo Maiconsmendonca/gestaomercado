@@ -1,3 +1,4 @@
+# Use the official PHP image as base
 FROM php:8.3-fpm
 
 # Install system dependencies
@@ -32,20 +33,22 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
 
 # Install Xdebug
 RUN pecl install xdebug \
-    && docker-php-ext-enable xdebug
+    && docker-php-ext-enable xdebug \
+    && echo "xdebug.mode=debug" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "xdebug.start_with_request=yes" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "xdebug.client_host=host.docker.internal" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
-# Install Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-# Copy custom php.ini settings
-COPY php.ini /usr/local/etc/php/conf.d/php.ini
+# Custom php.ini settings
+RUN echo "date.timezone = America/Sao_Paulo" >> /usr/local/etc/php/conf.d/docker-php.ini \
+    && echo "memory_limit = 512M" >> /usr/local/etc/php/conf.d/docker-php.ini \
+    && echo "upload_max_filesize = 100M" >> /usr/local/etc/php/conf.d/docker-php.ini \
+    && echo "post_max_size = 100M" >> /usr/local/etc/php/conf.d/docker-php.ini
 
 # Set working directory
 WORKDIR /var/www/html
 
-# Expose port 9000 and 9003 for PHP-FPM and Xdebug
+# Expose ports 9000 and 9003 for PHP-FPM and Xdebug
 EXPOSE 9000 9003
 
 # Start PHP-FPM
 CMD ["php-fpm"]
-
