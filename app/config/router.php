@@ -22,14 +22,18 @@ class router
         $requestMethod = $_SERVER['REQUEST_METHOD'];
 
         foreach (self::$routes as $route) {
-            if ($route['path'] === $requestUri && strtolower($route['method']) === strtolower($requestMethod)) {
+            $pattern = preg_replace('#\{([a-z]+)\}#', '([^/]+)', $route['path']);
+            $pattern = "#^" . $pattern . "$#";
+
+            if (preg_match($pattern, $requestUri, $matches) && strtolower($route['method']) === strtolower($requestMethod)) {
+                array_shift($matches); // Remove the full match result
                 list($controllerName, $methodName) = explode('@', $route['action']);
 
                 $controllerClass = "App\\Controller\\" . $controllerName;
                 if (class_exists($controllerClass)) {
                     $controller = new $controllerClass();
                     if (method_exists($controller, $methodName)) {
-                        call_user_func_array([$controller, $methodName], []);
+                        call_user_func_array([$controller, $methodName], $matches);
                         return;
                     } else {
                         echo "Método $methodName não encontrado no controlador $controllerClass";

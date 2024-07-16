@@ -17,8 +17,31 @@ class ProductRepository
         $this->pdo = Database::getInstance();
     }
 
-    public function getProductById($id)
+    public function getById($id)
     {
+        try {
+            $stmt = $this->pdo->prepare("SELECT * FROM products WHERE id = :id");
+            $stmt->execute(['id' => $id]);
+            $rows = $stmt->fetch();
+
+            var_dump($rows);exit;
+
+            if (empty($rows)) {
+                return [];
+            }
+
+            $products = [];
+            foreach ($rows as $row) {
+                $products[] = new Product($row);
+            }
+
+//            var_dump($products);exit;
+
+            return $products;
+        } catch (PDOException $e) {
+            die("Erro ao buscar produtos: " . $e->getMessage());
+        }
+
         $stmt = $this->pdo->prepare("SELECT * FROM products WHERE id = :id");
         $stmt->execute(['id' => $id]);
         $row = $stmt->fetch();
@@ -28,11 +51,10 @@ class ProductRepository
     public function getAll()
     {
         try {
-            $stmt = $this->pdo->query("SELECT products.id, products.name, products.price, product_types.tax_rate FROM products JOIN product_types ON products.productTypeId = product_types.id;");
+            $stmt = $this->pdo->query("SELECT products.id, products.name, products.price, product_types.tax_rate, products.productTypeId FROM products JOIN product_types ON products.productTypeId = product_types.id;");
             $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             if (empty($rows)) {
-                // Se não houver dados, retorna um array vazio
                 return [];
             }
 
@@ -40,6 +62,8 @@ class ProductRepository
             foreach ($rows as $row) {
                 $products[] = new Product($row);
             }
+
+//            var_dump($products);exit;
 
             return $products;
         } catch (PDOException $e) {

@@ -4,18 +4,19 @@ namespace App\Models;
 
 use AllowDynamicProperties;
 
-class Product
-{
+class Product {
     private $id;
     private $name;
     private $price;
     private $taxRate;
+    private $productTypeId; // Adicionado
 
     public function __construct(array $data) {
         $this->id = $data['id'] ?? null;
         $this->name = $data['name'] ?? '';
         $this->price = $data['price'] ?? 0;
         $this->taxRate = $data['tax_rate'] ?? 0;
+        $this->productTypeId = $data['productTypeId'] ?? null; // Adicionado
     }
 
     // ID
@@ -41,6 +42,7 @@ class Product
         return $this->productTypeId;
     }
 
+    // Setter para productTypeId
     public function setProductTypeId($productTypeId) {
         $this->productTypeId = $productTypeId;
     }
