@@ -4,28 +4,56 @@ namespace App\Repository;
 
 class SaleRepository
 {
-    public function getAllSales()
+    public function createSale(Sale $sale)
     {
-        return "SELECT * FROM sales";
+        $pdo = Database::getConnection();
+        $stmt = $pdo->prepare("INSERT INTO sales (date) VALUES (:date)");
+        $stmt->execute(['date' => $sale->date]);
+        $saleId = $pdo->lastInsertId();
+
+        // Insert sale items
+        foreach ($sale->items as $item) {
+            $this->createSaleItem($saleId, $item);
+        }
+
+        return $this->getSaleById($saleId);
     }
 
-    public function createSale($data)
+    protected function createSaleItem($saleId, SaleItem $item)
     {
-        return "INSERT INTO sales (product_id, quantity, sale_date) VALUES ({$data['product_id']}, {$data['quantity']}, '{$data['sale_date']}')";
+        $pdo = Database::getConnection();
+        $stmt = $pdo->prepare("INSERT INTO sale_items (sale_id, product_id, quantity, unit_price, tax) VALUES (:sale_id, :product_id, :quantity, :unit_price, :tax)");
+        $stmt->execute([
+            'sale_id' => $saleId,
+            'product_id' => $item->productId,
+            'quantity' => $item->quantity,
+            'unit_price' => $item->unitPrice,
+            'tax' => $item->tax
+        ]);
     }
 
     public function getSaleById($id)
     {
-        return "SELECT * FROM sales WHERE id = {$id}";
+        $pdo = Database::getConnection();
+        $stmt = $pdo->prepare("SELECT * FROM sales WHERE id = :id");
+        $stmt->execute(['id' => $id]);
+        $row = $stmt->fetch();
+
+        // Fetch sale items
+        $items = $this->getSaleItemsBySaleId($id);
+
+        return new Sale($row['id'], $row['date'], $items);
     }
 
-    public function updateSale($id, $data)
+    protected function getSaleItemsBySaleId($saleId)
     {
-        return "UPDATE sales SET product_id = {$data['product_id']}, quantity = {$data['quantity']}, sale_date = '{$data['sale_date']}' WHERE id = {$id}";
-    }
-
-    public function deleteSale($id)
-    {
-        return "DELETE FROM sales WHERE id = {$id}";
+        $pdo = Database::getConnection();
+        $stmt = $pdo->prepare("SELECT * FROM sale_items WHERE sale_id = :sale_id");
+        $stmt->execute(['sale_id' => $saleId]);
+        $items = [];
+        while ($row = $stmt->fetch()) {
+            $items[] = new SaleItem($row['product_id'], $row['quantity'], $row['unit_price'], $row['tax']);
+        }
+        return $items;
     }
 }

@@ -1,37 +1,36 @@
-CREATE TABLE tipos_de_produtos (
-                                   id INT AUTO_INCREMENT PRIMARY KEY,
-                                   nome VARCHAR(255) NOT NULL
+CREATE TABLE IF NOT EXISTS taxes (
+                                     id INT AUTO_INCREMENT PRIMARY KEY,
+                                     name VARCHAR(255) NOT NULL,
+    rate DECIMAL(5, 2) NOT NULL
+    );
+
+CREATE TABLE IF NOT EXISTS product_types (
+                                             id INT AUTO_INCREMENT PRIMARY KEY,
+                                             name VARCHAR(255) NOT NULL,
+    tax_rate DECIMAL(5, 2) NOT NULL
+    );
+
+CREATE TABLE IF NOT EXISTS products (
+                                        id INT AUTO_INCREMENT PRIMARY KEY,
+                                        name VARCHAR(255) NOT NULL,
+    productTypeId INT NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (productTypeId) REFERENCES product_types(id)
+    );
+
+CREATE TABLE IF NOT EXISTS sales (
+                                     id INT AUTO_INCREMENT PRIMARY KEY,
+                                     date DATE NOT NULL
 );
 
-CREATE TABLE produtos (
-                          id INT AUTO_INCREMENT PRIMARY KEY,
-                          nome VARCHAR(255) NOT NULL,
-                          tipo_produto_id INT,
-                          preco DECIMAL(10, 2) NOT NULL,
-                          FOREIGN KEY (tipo_produto_id) REFERENCES tipos_de_produtos(id)
-);
+CREATE TABLE IF NOT EXISTS sale_items (
+                                          id INT AUTO_INCREMENT PRIMARY KEY,
+                                          sale_id INT NOT NULL,
+                                          product_id INT NOT NULL,
+                                          quantity INT NOT NULL,
+                                          unit_price DECIMAL(10, 2) NOT NULL,
+    tax DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (sale_id) REFERENCES sales(id),
+    FOREIGN KEY (product_id) REFERENCES products(id)
+    );
 
-CREATE TABLE impostos (
-                          id INT AUTO_INCREMENT PRIMARY KEY,
-                          tipo_produto_id INT,
-                          percentual DECIMAL(5, 2) NOT NULL,
-                          FOREIGN KEY (tipo_produto_id) REFERENCES tipos_de_produtos(id)
-);
-
-CREATE TABLE vendas (
-                        id INT AUTO_INCREMENT PRIMARY KEY,
-                        data_hora DATETIME DEFAULT CURRENT_TIMESTAMP,
-                        valor_total DECIMAL(10, 2) NOT NULL,
-                        imposto_total DECIMAL(10, 2) NOT NULL
-);
-
-CREATE TABLE itens_de_venda (
-                                id INT AUTO_INCREMENT PRIMARY KEY,
-                                venda_id INT,
-                                produto_id INT,
-                                quantidade INT,
-                                preco DECIMAL(10, 2) NOT NULL,
-                                imposto DECIMAL(10, 2) NOT NULL,
-                                FOREIGN KEY (venda_id) REFERENCES vendas(id),
-                                FOREIGN KEY (produto_id) REFERENCES produtos(id)
-);

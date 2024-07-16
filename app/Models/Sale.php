@@ -4,8 +4,20 @@ namespace App\Models;
 
 class Sale
 {
-    public $id;
-    public $items = []; // Array of SaleItem
-    public $totalAmount;
-    public $totalTax;
+    private $id;
+    private $productId;
+    private $quantity;
+    private $unitPrice;
+    private $taxAmount;
+    private $totalAmount;
+
+    public function __construct($id, $productId, $quantity, $unitPrice, $taxAmount, $totalAmount)
+    {
+        $this->id = $id;
+        $this->productId = $productId;
+        $this->quantity = $quantity;
+        $this->unitPrice = $unitPrice;
+        $this->taxAmount = $taxAmount;
+        $this->totalAmount = $totalAmount;
+    }
 }

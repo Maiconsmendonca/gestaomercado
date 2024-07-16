@@ -3,6 +3,9 @@
 namespace App\config;
 
 use PDO;
+use function PHPUnit\Framework\exactly;
+
+require_once __DIR__ . '/../../config.php';
 
 class database
 {
@@ -10,9 +13,10 @@ class database
 
     public static function getInstance()
     {
+
         if (self::$instance === null) {
-            $dsn = getenv('DB_CONNECTION') . ':host=' . getenv('DB_HOST') . ';dbname=' . getenv('DB_DATABASE') . ';port=' . getenv('DB_PORT');
-            self::$instance = new PDO($dsn, getenv('DB_USERNAME'), getenv('DB_PASSWORD'));
+            $dsn = $_ENV['DB_CONNECTION'] . ':host=' . $_ENV['DB_HOST'] . ';dbname=' . $_ENV['DB_DATABASE'] . ';port=' . $_ENV['DB_PORT'];
+            self::$instance = new PDO($dsn, $_ENV['DB_USERNAME'], $_ENV['DB_PASSWORD']);
             self::$instance->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         }
 

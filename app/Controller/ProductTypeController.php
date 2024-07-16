@@ -13,26 +13,71 @@ class ProductTypeController
 
     public function index()
     {
-        return $this->productTypeService->getAllProductTypes();
+        $productTypes = $this->productTypeService->getAllProductTypes();
+        header('Content-Type: application/json');
+        echo json_encode($productTypes);
     }
 
-    public function store($data)
-    {
-        return $this->productTypeService->createProductType($data);
-    }
-
+    // Método para buscar um tipo de produto por ID
     public function show($id)
     {
-        return $this->productTypeService->getProductTypeById($id);
+        $productType = $this->productTypeService->getProductTypeById($id);
+
+        if (!$productType) {
+            http_response_code(404);
+            echo json_encode(['message' => 'Tipo de produto não encontrado']);
+            return;
+        }
+
+        header('Content-Type: application/json');
+        echo json_encode($productType);
     }
 
-    public function update($id, $data)
+    // Método para criar um novo tipo de produto
+    public function store()
     {
-        return $this->productTypeService->updateProductType($id, $data);
+        $inputJSON = file_get_contents('php://input');
+        $input = json_decode($inputJSON, true);
+
+        $created = $this->productTypeService->createProductType($input);
+
+        if ($created) {
+            http_response_code(201); // Created
+            echo json_encode(['message' => 'Tipo de produto criado com sucesso']);
+        } else {
+            http_response_code(400); // Bad Request
+            echo json_encode(['message' => 'Erro ao criar o tipo de produto']);
+        }
     }
 
+    // Método para atualizar um tipo de produto por ID
+    public function update($id)
+    {
+        $inputJSON = file_get_contents('php://input');
+        $input = json_decode($inputJSON, true);
+
+        $updated = $this->productTypeService->updateProductType($id, $input);
+
+        if ($updated) {
+            http_response_code(200);
+            echo json_encode(['message' => 'Tipo de produto atualizado com sucesso']);
+        } else {
+            http_response_code(404);
+            echo json_encode(['message' => 'Erro ao atualizar o tipo de produto']);
+        }
+    }
+
+    // Método para excluir um tipo de produto por ID
     public function destroy($id)
     {
-        return $this->productTypeService->deleteProductType($id);
+        $deleted = $this->productTypeService->deleteProductType($id);
+
+        if ($deleted) {
+            http_response_code(200);
+            echo json_encode(['message' => 'Tipo de produto excluído com sucesso']);
+        } else {
+            http_response_code(404);
+            echo json_encode(['message' => 'Erro ao excluir o tipo de produto']);
+        }
     }
 }

@@ -10,8 +10,9 @@ class TaxCalculator {
         $this->taxRepository = $taxRepository;
     }
 
-    public function calculateTax($productId, $quantity, $price) {
-        // Implementar lógica para calcular a taxa com base no tipo de produto
-        // e retornar o valor da taxa.
+    public function calculateTax($taxRate, $unitPrice, $quantity)
+    {
+        $taxAmount = ($taxRate / 100) * $unitPrice * $quantity;
+        return $taxAmount;
     }
 }

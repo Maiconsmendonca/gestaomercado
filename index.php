@@ -4,7 +4,6 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 use App\config\router;
 
-// Instancia o roteador
 $router = new router();
 
 // Determina se a requisição é para a API ou para a web

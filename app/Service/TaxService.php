@@ -6,26 +6,26 @@ use App\Repository\TaxRepository;
 
 class TaxService
 {
-    private TaxRepository $taxRepository;
+    protected $taxRepository;
 
-    public function __construct($taxRepository)
+    public function __construct(TaxRepository $taxRepository)
     {
         $this->taxRepository = $taxRepository;
     }
 
     public function getAllTaxes()
     {
-        // Lógica para buscar todos os impostos
+        return $this->taxRepository->getAllTaxes();
+    }
+
+    public function getTaxById($id)
+    {
+        return $this->taxRepository->getTaxById($id);
     }
 
     public function createTax($data)
     {
         // Lógica para criar um novo imposto
-    }
-
-    public function getTaxById($id)
-    {
-        // Lógica para buscar um imposto pelo ID
     }
 
     public function updateTax($id, $data)

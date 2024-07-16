@@ -15,26 +15,44 @@ class ProductTypeService
 
     public function getAllProductTypes()
     {
-        // Lógica para buscar todos os tipos de produtos
-    }
-
-    public function createProductType($data)
-    {
-        // Lógica para criar um novo tipo de produto
+        return $this->productTypeRepository->getAll();
     }
 
     public function getProductTypeById($id)
     {
-        // Lógica para buscar um tipo de produto pelo ID
+        return $this->productTypeRepository->getById($id);
+    }
+
+    public function createProductType($data)
+    {
+        $newProductType = new ProductType(
+            null, // O ID será gerado automaticamente pelo banco de dados
+            $data['name'],
+            $data['tax_percentage']
+        );
+
+        return $this->productTypeRepository->insert($newProductType);
     }
 
     public function updateProductType($id, $data)
     {
-        // Lógica para atualizar um tipo de produto
+        $productType = $this->productTypeRepository->getById($id);
+
+        if (!$productType) {
+            return false; // Tipo de produto não encontrado
+        }
+
+        $updatedProductType = new ProductType(
+            $id,
+            $data['name'],
+            $data['tax_percentage']
+        );
+
+        return $this->productTypeRepository->update($updatedProductType);
     }
 
     public function deleteProductType($id)
     {
-        // Lógica para deletar um tipo de produto
+        return $this->productTypeRepository->delete($id);
     }
 }
