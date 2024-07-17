@@ -2,23 +2,26 @@
 
 namespace App\Service;
 
+use App\Helper\CalculateHelper;
+use App\Models\Sale;
+use App\Models\SaleItem;
 use App\Repository\SaleRepository;
+use Exception;
+use PDOException;
+use function PHPUnit\Framework\exactly;
 
 class SaleService
 {
     protected $saleRepository;
     protected $productService;
     protected $productTypeService;
-    protected $taxService;
-    protected $taxCalculator;
+    private $saleItemRepository;
 
-    public function __construct(SaleRepository $saleRepository, ProductService $productService, ProductTypeService $productTypeService, TaxService $taxService)
+    public function __construct(SaleRepository $saleRepository, ProductService $productService, ProductTypeService $productTypeService)
     {
         $this->saleRepository = $saleRepository;
         $this->productService = $productService;
         $this->productTypeService = $productTypeService;
-        $this->taxService = $taxService;
-        $this->taxCalculator = new TaxCalculator();
     }
 
     public function createSale($data)
@@ -31,17 +34,10 @@ class SaleService
                 throw new Exception('Produto não encontrado');
             }
 
-            $productType = $this->productTypeService->getProductTypeById($product->typeId);
-            if (!$productType) {
-                throw new Exception('Tipo de produto não encontrado');
-            }
-
-            $tax = $this->taxCalculator->calculateTax($productType->taxRate, $itemData['unit_price'], $itemData['quantity']);
-            $items[] = new SaleItem($itemData['product_id'], $itemData['quantity'], $itemData['unit_price'], $tax);
+            $items[] = new SaleItem($itemData['product_id'], $itemData['quantity'], $product['price'], $product['taxPorcentage']);
         }
-
-        $sale = new Sale(null, date('Y-m-d'), $items);
-        return $this->saleRepository->createSale($sale);
+        $saleId = $this->saleRepository->createSale($items);
+        $this->saleItemRepository->createSaleItem($saleId, $items);
     }
 
     public function getAllSales()
@@ -67,5 +63,54 @@ class SaleService
             'total_taxes' => $totalTaxes,
             'grand_total' => $totalSales + $totalTaxes
         ];
+    }
+
+    public function getSaleDetails($saleId)
+    {
+        try {
+            $saleData = $this->saleRepository->getSaleById($saleId);
+
+            $formattedSaleItems = [];
+            $totalTaxes = 0;
+            $totalSaleWithoutTaxes = 0;
+            $totalSaleWithTaxes = 0;
+
+            foreach ($saleData['saleDetails'] as $item) {
+                // Calcula a porcentagem de taxa e o valor da taxa sem multiplicação
+                $taxPercentage = ($item['tax_amount'] / ($item['unit_price'] * $item['quantity'])) * 100;
+                $taxValue = $item['tax_amount'] / $item['quantity'];
+
+                $formattedSaleItems[] = [
+                    'id' => $item['id'],
+                    'product_id' => $item['product_id'],
+                    'product_name' => $item['product_name'],
+                    'category_name' => $item['category_name'],
+                    'quantity' => $item['quantity'],
+                    'unit_price' => $item['unit_price'],
+                    'tax_amount' => $item['tax_amount'],
+                    'total_amount' => $item['total_amount'],
+                    'tax_percentage' => round($taxPercentage, 2), // Arredonda para 2 casas decimais
+                    'tax_value' => round($taxValue, 2) // Arredonda para 2 casas decimais
+                ];
+
+                $totalTaxes += $item['tax_amount'];
+                $totalSaleWithoutTaxes += ($item['unit_price'] * $item['quantity']);
+                $totalSaleWithTaxes += ($item['unit_price'] * $item['quantity']) + $item['tax_amount'];
+            }
+
+            $totalTaxes = round($totalTaxes, 2);
+            $totalSaleWithTaxes = round($totalSaleWithTaxes, 2);
+
+            return [
+                'saleDetails' => $formattedSaleItems,
+                'totals' => [
+                    'totalTaxes' => $totalTaxes,
+                    'totalSaleWithoutTaxes' => $totalSaleWithoutTaxes,
+                    'totalSaleWithTaxes' => $totalSaleWithTaxes,
+                ]
+            ];
+        } catch (Exception $e) {
+            throw new Exception("Erro ao buscar detalhes da venda: " . $e->getMessage());
+        }
     }
 }

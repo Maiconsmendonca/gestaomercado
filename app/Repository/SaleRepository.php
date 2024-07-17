@@ -2,58 +2,106 @@
 
 namespace App\Repository;
 
+use App\config\database;
+use App\Helper\CalculateHelper;
+use App\Models\SaleItem;
+use App\Repository\SaleItemRepository;
+use Exception;
+use PDOException;
+
 class SaleRepository
 {
-    public function createSale(Sale $sale)
-    {
-        $pdo = Database::getConnection();
-        $stmt = $pdo->prepare("INSERT INTO sales (date) VALUES (:date)");
-        $stmt->execute(['date' => $sale->date]);
-        $saleId = $pdo->lastInsertId();
+    private $pdo;
+    private SaleItemRepository $saleItemRepository;
 
-        // Insert sale items
-        foreach ($sale->items as $item) {
-            $this->createSaleItem($saleId, $item);
+    public function __construct()
+    {
+        $this->pdo = Database::getInstance();
+        $this->saleItemRepository = new SaleItemRepository();
+    }
+
+    public function createSale($saleData)
+    {
+        try {
+            $this->pdo->beginTransaction();
+
+            $stmt = $this->pdo->prepare("INSERT INTO sales (date) VALUES (NOW())");
+            $stmt->execute();
+            $saleId = $this->pdo->lastInsertId();
+
+            foreach ($saleData as $itemData) {
+                $tax = CalculateHelper::calculateTax($itemData->getTaxPorcentage(), $itemData->getPrice());
+                $itemData->setTax($tax);
+
+                $taxAmount = CalculateHelper::calculateTotalTax($itemData->getTax(), $itemData->getQuantity());
+                $itemData->setTaxAmount($taxAmount);
+
+                $totalAmount = CalculateHelper::calculateTotalPrice($itemData->getPrice(), $itemData->getQuantity());
+                $itemData->setTotalAmount($totalAmount);
+
+                $totalAmountWhitTax = CalculateHelper::calculateTotalWithTax($itemData->getPrice(), $itemData->getQuantity(), $taxAmount);
+                $itemData->setTotalAmountWhitTax($totalAmountWhitTax);
+
+                $this->saleItemRepository->createSaleItem($saleId, $itemData);
+            }
+
+            $this->pdo->commit();
+            return $this->getSaleById($saleId);
+        } catch (PDOException $e) {
+            $this->pdo->rollBack();
+            throw new Exception("Erro ao criar venda: " . $e->getMessage());
         }
-
-        return $this->getSaleById($saleId);
     }
 
-    protected function createSaleItem($saleId, SaleItem $item)
+    public function getSaleById($saleId)
     {
-        $pdo = Database::getConnection();
-        $stmt = $pdo->prepare("INSERT INTO sale_items (sale_id, product_id, quantity, unit_price, tax) VALUES (:sale_id, :product_id, :quantity, :unit_price, :tax)");
-        $stmt->execute([
-            'sale_id' => $saleId,
-            'product_id' => $item->productId,
-            'quantity' => $item->quantity,
-            'unit_price' => $item->unitPrice,
-            'tax' => $item->tax
-        ]);
-    }
+        $saleData = [];
+        $totalTaxes = 0;
+        $totalSaleWithoutTaxes = 0;
+        $totalSaleWithTaxes = 0;
 
-    public function getSaleById($id)
-    {
-        $pdo = Database::getConnection();
-        $stmt = $pdo->prepare("SELECT * FROM sales WHERE id = :id");
-        $stmt->execute(['id' => $id]);
-        $row = $stmt->fetch();
+        try {
+            $stmt = $this->pdo->prepare("
+        SELECT s.*, si.product_id, si.quantity, si.unit_price, si.tax_amount, si.total_amount, p.name AS product_name, pt.name AS category_name
+        FROM sales s
+        LEFT JOIN sale_items si ON s.id = si.sale_id
+        LEFT JOIN products p ON si.product_id = p.id
+        LEFT JOIN product_types pt ON p.productTypeId = pt.id
+        WHERE s.id = :saleId
+        ");
+            $stmt->execute([':saleId' => $saleId]);
+            $saleItems = $stmt->fetchAll();
 
-        // Fetch sale items
-        $items = $this->getSaleItemsBySaleId($id);
+            if ($saleItems) {
+                foreach ($saleItems as $item) {
+                    $totalTaxes += $item['tax_amount'];
+                    $totalSaleWithoutTaxes += $item['unit_price'] * $item['quantity'];
+                    $totalSaleWithTaxes += $item['total_amount'];
+                }
 
-        return new Sale($row['id'], $row['date'], $items);
-    }
+                $saleData = [
+                    'saleDetails' => array_map(function ($item) {
+                        return [
+                            'id' => $item['id'],
+                            'product_id' => $item['product_id'],
+                            'product_name' => $item['product_name'],
+                            'category_name' => $item['category_name'],
+                            'quantity' => $item['quantity'],
+                            'unit_price' => $item['unit_price'],
+                            'tax_amount' => $item['tax_amount'],
+                            'total_amount' => $item['total_amount'],
+                        ];
+                    }, $saleItems),
+                    'totalTaxes' => $totalTaxes,
+                    'totalSaleWithoutTaxes' => $totalSaleWithoutTaxes,
+                    'totalSaleWithTaxes' => $totalSaleWithTaxes
+                ];
+            }
 
-    protected function getSaleItemsBySaleId($saleId)
-    {
-        $pdo = Database::getConnection();
-        $stmt = $pdo->prepare("SELECT * FROM sale_items WHERE sale_id = :sale_id");
-        $stmt->execute(['sale_id' => $saleId]);
-        $items = [];
-        while ($row = $stmt->fetch()) {
-            $items[] = new SaleItem($row['product_id'], $row['quantity'], $row['unit_price'], $row['tax']);
+            return $saleData;
+        } catch (PDOException $e) {
+            throw new Exception("Erro ao buscar venda: " . $e->getMessage());
         }
-        return $items;
     }
+
 }

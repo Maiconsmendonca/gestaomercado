@@ -20,38 +20,32 @@ class ProductRepository
     public function getById($id)
     {
         try {
-            $stmt = $this->pdo->prepare("SELECT * FROM products WHERE id = :id");
+            $stmt = $this->pdo->prepare("
+                        SELECT products.*, product_types.tax_porcentage
+                        FROM products 
+                        JOIN product_types ON products.productTypeId = product_types.id 
+                        WHERE products.id = :id");
             $stmt->execute(['id' => $id]);
-            $rows = $stmt->fetch();
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            var_dump($rows);exit;
-
-            if (empty($rows)) {
-                return [];
+            if (!$row) {
+                return null;
             }
 
-            $products = [];
-            foreach ($rows as $row) {
-                $products[] = new Product($row);
-            }
-
-//            var_dump($products);exit;
-
-            return $products;
+            return new Product($row);
         } catch (PDOException $e) {
             die("Erro ao buscar produtos: " . $e->getMessage());
         }
-
-        $stmt = $this->pdo->prepare("SELECT * FROM products WHERE id = :id");
-        $stmt->execute(['id' => $id]);
-        $row = $stmt->fetch();
-        return new Product($row['id'], $row['name'], $row['type_id'], $row['unit_price']);
     }
 
     public function getAll()
     {
         try {
-            $stmt = $this->pdo->query("SELECT products.id, products.name, products.price, product_types.tax_rate, products.productTypeId FROM products JOIN product_types ON products.productTypeId = product_types.id;");
+            $stmt = $this->pdo->query(
+                "SELECT products.id, products.name, products.price, product_types.tax_porcentage, products.productTypeId
+            FROM products
+            JOIN product_types ON products.productTypeId = product_types.id
+            WHERE products.deleted_at IS NULL;");
             $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             if (empty($rows)) {
@@ -62,8 +56,6 @@ class ProductRepository
             foreach ($rows as $row) {
                 $products[] = new Product($row);
             }
-
-//            var_dump($products);exit;
 
             return $products;
         } catch (PDOException $e) {
@@ -86,25 +78,42 @@ class ProductRepository
         }
     }
 
-    public function update(Product $product)
+    public function update($id, $fields)
     {
-        foreach ($this->products as &$p) {
-            if ($p->getId() == $product->getId()) {
-                $p = $product;
-                return true;
-            }
+        $sqlParts = [];
+        $values = [];
+
+        foreach ($fields as $key => $value) {
+            $sqlParts[] = "$key = ?";
+            $values[] = $value;
         }
-        return false;
+
+        if (empty($sqlParts)) {
+            return false;
+        }
+
+        $sql = "UPDATE products SET " . implode(", ", $sqlParts) . " WHERE id = ?";
+        $values[] = $id;
+
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute($values);
+            return $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            return false;
+        }
     }
 
     public function delete($id)
     {
-        foreach ($this->products as $key => $product) {
-            if ($product->getId() == $id) {
-                unset($this->products[$key]);
-                return true;
-            }
+        $sql = "UPDATE products SET deleted_at = NOW() WHERE id = ?";
+
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([$id]);
+            return $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            return false;
         }
-        return false;
     }
 }

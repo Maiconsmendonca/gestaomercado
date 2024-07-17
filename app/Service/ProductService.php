@@ -20,7 +20,7 @@ class ProductService {
                 'id' => $product->getId(),
                 'name' => $product->getName(),
                 'price' => $product->getPrice(),
-                'taxRate' => $product->getTaxRate()
+                'taxPorcentage' => $product->getTaxPorcentage()
             ];
         }
 
@@ -28,23 +28,20 @@ class ProductService {
     }
 
     public function getProductById($id) {
-        $productsFromRepo = $this->productRepository->getById($id);
-        $productsData = [];
+        $product = $this->productRepository->getById($id);
 
-        foreach ($productsFromRepo as $product) {
-            $productsData[] = [
-                'id' => $product->getId(),
-                'name' => $product->getName(),
-                'price' => $product->getPrice(),
-                'taxRate' => $product->getTaxRate()
-            ];
+        if (!$product) {
+            return null;
         }
-
-        return $productsData;
+        return [
+            'id' => $product->getId(),
+            'name' => $product->getName(),
+            'price' => $product->getPrice(),
+            'taxPorcentage' => $product->getTaxPorcentage()
+        ];
     }
 
     public function addProduct($name, $productTypeId, $price): void {
-        // Ajuste para criar um produto usando um array associativo
         $productData = [
             'name' => $name,
             'productTypeId' => $productTypeId,
@@ -54,19 +51,9 @@ class ProductService {
         $this->productRepository->insertProduct($product);
     }
 
-    public function updateProduct($id, $data) {
-        $product = $this->productRepository->getById($id);
-
-        if (!$product) {
-            return false; // Produto não encontrado
-        }
-
-        // Utilize os métodos setters para atualizar o produto
-        $product->setName($data['name']);
-        $product->setProductTypeId($data['productTypeId']);
-        $product->setPrice($data['price']);
-
-        return $this->productRepository->update($product);
+    public function updateProduct($id, $fields)
+    {
+        return $this->productRepository->update($id, $fields);
     }
 
     public function deleteProduct($id) {

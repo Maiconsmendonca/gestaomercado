@@ -2,11 +2,12 @@
 
 namespace App\Service;
 
-use App\Repository\ProductRepository;
+use App\Models\ProductType;
+use App\Repository\ProductTypeRepository;
 
 class ProductTypeService
 {
-    private ProductRepository $productTypeRepository;
+    private ProductTypeRepository $productTypeRepository;
 
     public function __construct($productTypeRepository)
     {
@@ -15,40 +16,49 @@ class ProductTypeService
 
     public function getAllProductTypes()
     {
-        return $this->productTypeRepository->getAll();
+        $productTypesFromRepo = $this->productTypeRepository->getAll();
+
+        $productTypesData = [];
+
+        foreach ($productTypesFromRepo as $productType) {
+            $productTypesData[] = [
+                'id' => $productType->getId(),
+                'name' => $productType->getName(),
+                'taxPorcentage' => $productType->getTaxPorcentage()
+            ];
+        }
+
+        return $productTypesData;
+
     }
 
     public function getProductTypeById($id)
     {
-        return $this->productTypeRepository->getById($id);
-    }
-
-    public function createProductType($data)
-    {
-        $newProductType = new ProductType(
-            null, // O ID será gerado automaticamente pelo banco de dados
-            $data['name'],
-            $data['tax_percentage']
-        );
-
-        return $this->productTypeRepository->insert($newProductType);
-    }
-
-    public function updateProductType($id, $data)
-    {
         $productType = $this->productTypeRepository->getById($id);
 
         if (!$productType) {
-            return false; // Tipo de produto não encontrado
+            return null;
         }
+        return [
+            'id' => $productType->getId(),
+            'name' => $productType->getName(),
+            'taxPorcentage' => $productType->getTaxPorcentage()
+        ];
+    }
 
-        $updatedProductType = new ProductType(
-            $id,
-            $data['name'],
-            $data['tax_percentage']
-        );
+    public function createProductType($name, $taxPorcentage)
+    {
+        $productTypeData = [
+            'name' => $name,
+            'taxPorcentage' => $taxPorcentage,
+        ];
+        $productType = new ProductType($productTypeData);
+        $this->productTypeRepository->insertProductType($productType);
+    }
 
-        return $this->productTypeRepository->update($updatedProductType);
+    public function updateProductType($id, $fields)
+    {
+        return $this->productTypeRepository->update($id, $fields);
     }
 
     public function deleteProductType($id)

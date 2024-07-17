@@ -2,13 +2,18 @@
 
 namespace App\Controller;
 
+use App\Repository\ProductTypeRepository;
+use App\Service\ProductTypeService;
+
 class ProductTypeController
 {
-    private $productTypeService;
+    private ProductTypeService $productTypeService;
 
-    public function __construct($productTypeService)
+    public function __construct()
     {
-        $this->productTypeService = $productTypeService;
+        $productTypeRepository = new ProductTypeRepository();
+
+        $this->productTypeService = new ProductTypeService($productTypeRepository);
     }
 
     public function index()
@@ -18,7 +23,6 @@ class ProductTypeController
         echo json_encode($productTypes);
     }
 
-    // Método para buscar um tipo de produto por ID
     public function show($id)
     {
         $productType = $this->productTypeService->getProductTypeById($id);
@@ -33,28 +37,44 @@ class ProductTypeController
         echo json_encode($productType);
     }
 
-    // Método para criar um novo tipo de produto
     public function store()
     {
         $inputJSON = file_get_contents('php://input');
         $input = json_decode($inputJSON, true);
 
-        $created = $this->productTypeService->createProductType($input);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            http_response_code(400);
+            echo json_encode(['message' => 'Erro ao decodificar JSON']);
+            return;
+        }
 
-        if ($created) {
-            http_response_code(201); // Created
-            echo json_encode(['message' => 'Tipo de produto criado com sucesso']);
+        $name = $input['name'] ?? null;
+        $taxPorcentage = $input['taxPorcentage'] ?? null;
+
+        if ($name && $taxPorcentage) {
+            try {
+                $this->productTypeService->createProductType($name, $taxPorcentage);
+                http_response_code(201);
+                echo json_encode(['message' => 'Tipo de produto adicionado com sucesso.']);
+            } catch (\Exception $e) {
+                http_response_code(500);
+                echo json_encode(['message' => 'Erro ao adicionar tipo de produto: ' . $e->getMessage()]);
+            }
         } else {
-            http_response_code(400); // Bad Request
-            echo json_encode(['message' => 'Erro ao criar o tipo de produto']);
+            http_response_code(400);
+            echo json_encode(['message' => 'Dados incompletos para adicionar o tipo de produto.']);
         }
     }
 
-    // Método para atualizar um tipo de produto por ID
     public function update($id)
     {
         $inputJSON = file_get_contents('php://input');
         $input = json_decode($inputJSON, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE || empty($input)) {
+            http_response_code(400);
+            echo json_encode(['message' => 'Dados de entrada inválidos.']);
+        }
 
         $updated = $this->productTypeService->updateProductType($id, $input);
 
@@ -67,7 +87,6 @@ class ProductTypeController
         }
     }
 
-    // Método para excluir um tipo de produto por ID
     public function destroy($id)
     {
         $deleted = $this->productTypeService->deleteProductType($id);

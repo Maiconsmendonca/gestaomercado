@@ -1,16 +1,14 @@
-version: '3.8'
-
 services:
-  php:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - "80:80"
-    volumes:
-      - ${PWD}:/var/www/html
-    networks:
-      - app-network
+#  php:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    ports:
+#      - "80:80"
+#    volumes:
+#      - ${PWD}:/var/www/html
+#    networks:
+#      - app-network
 
   mysql:
     image: mysql:8.0
@@ -22,11 +20,11 @@ services:
       - MYSQL_PASSWORD=root
     ports:
       - "3306:3306"
-    networks:
-      - app-network
+#    networks:
+#      - app-network
 
 volumes:
   mysql-data:
-
-networks:
-  app-network:
+#
+#networks:
+#  app-network:

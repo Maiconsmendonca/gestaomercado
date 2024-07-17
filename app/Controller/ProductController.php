@@ -36,9 +36,8 @@ class ProductController {
 
     public function store()
     {
-        // Lê o corpo da requisição
         $inputJSON = file_get_contents('php://input');
-        $input = json_decode($inputJSON, true); // Decodifica o JSON para um array associativo
+        $input = json_decode($inputJSON, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             http_response_code(400);
@@ -69,6 +68,11 @@ class ProductController {
     {
         $inputJSON = file_get_contents('php://input');
         $input = json_decode($inputJSON, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE || empty($input)) {
+            http_response_code(400);
+            echo json_encode(['message' => 'Dados de entrada inválidos.']);
+        }
 
         $updated = $this->productService->updateProduct($id, $input);
 
