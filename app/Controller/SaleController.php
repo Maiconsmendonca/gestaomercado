@@ -9,7 +9,7 @@ use App\Service\ProductService;
 use App\Service\ProductTypeService;
 use App\Service\SaleService;
 
-class SaleController
+class aleController
 {
     private SaleService $saleService;
 
