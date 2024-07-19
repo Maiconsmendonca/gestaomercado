@@ -36,3 +36,39 @@
     transform: rotate(360deg);
   }
 }
+/* Adicione isso no seu arquivo CSS global ou no componente */
+.relative {
+  position: relative;
+}
+
+.absolute {
+  position: absolute;
+}
+
+.pl-16 {
+  padding-left: 4rem; /* Ajuste conforme necessário */
+}
+
+.mt-1 {
+  margin-top: 0.25rem;
+}
+
+.block {
+  display: block;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.rounded {
+  border-radius: 0.375rem; /* Ajuste conforme necessário */
+}
+
+.border-gray-300 {
+  border-color: #d1d5db;
+}
+
+.bg-white {
+  background-color: #ffffff;
+}

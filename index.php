@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/vendor/autoload.php';
+include('app/config/cors.php');
 
 use App\config\router;
 
