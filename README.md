@@ -78,7 +78,7 @@ Para configurar o frontend, você precisa instalar as dependências do Node.js e
     Inicie o servidor Node.js executando o seguinte comando dentro da pasta gestaomercado/frontend:
     
     ```bash
-    npm run serve
+    npm start
     ```
     
     O servidor Node.js será iniciado e você poderá acessar o frontend através do navegador em http://localhost:8080.
