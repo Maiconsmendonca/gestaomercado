@@ -2,15 +2,30 @@
 
 namespace App\config;
 
+/**
+ *
+ */
 class router
 {
+    /**
+     * @var array
+     */
     private static $routes = [];
 
+    /**
+     * @param $method
+     * @param $path
+     * @param $action
+     * @return void
+     */
     public static function add($method, $path, $action)
     {
         self::$routes[] = ['method' => $method, 'path' => $path, 'action' => $action];
     }
 
+    /**
+     * @return void
+     */
     public static function dispatch()
     {
         $requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);

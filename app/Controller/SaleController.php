@@ -8,11 +8,21 @@ use App\Repository\SaleRepository;
 use App\Service\ProductService;
 use App\Service\ProductTypeService;
 use App\Service\SaleService;
+use function PHPUnit\Framework\exactly;
 
-class aleController
+/**
+ *
+ */
+class SaleController
 {
+    /**
+     * @var SaleService
+     */
     private SaleService $saleService;
 
+    /**
+     *
+     */
     public function __construct()
     {
         $saleRepository = new SaleRepository();
@@ -25,11 +35,26 @@ class aleController
         $this->saleService = new SaleService($saleRepository, $productService, $productTypeService);
     }
 
+    /**
+     * @return void
+     */
     public function index()
     {
-        return $this->saleService->getAllSales();
+        $sales = $this->saleService->getAllSales();
+
+        header('Content-Type: application/json');
+        if (empty($sales)) {
+            http_response_code(404); // Not Found
+            echo json_encode(['message' => 'No sales found']);
+        } else {
+            http_response_code(200); // OK
+            echo json_encode($sales);
+        }
     }
 
+    /**
+     * @return void
+     */
     public function store()
     {
         $inputJSON = file_get_contents('php://input');
@@ -61,6 +86,10 @@ class aleController
         }
     }
 
+    /**
+     * @param $id
+     * @return void
+     */
     public function show($id)
     {
         try {
@@ -74,11 +103,20 @@ class aleController
         }
     }
 
+    /**
+     * @param $id
+     * @param $data
+     * @return mixed
+     */
     public function update($id, $data)
     {
         return $this->saleService->updateSale($id, $data);
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function destroy($id)
     {
         return $this->saleService->deleteSale($id);

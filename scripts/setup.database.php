@@ -1,10 +1,12 @@
 <?php
-require 'path/to/your/config/database.php'; // Ajuste o caminho conforme necessário
+
+use App\config\database;
+
+require 'path/to/your/config/database.php';
 
 $db = Database::getInstance();
 
-// Caminho para o arquivo SQL
-$sqlFilePath = 'path/to/database_setup.sql'; // Ajuste o caminho conforme necessário
+$sqlFilePath = 'path/to/database_setup.sql';
 
 try {
     $query = file_get_contents($sqlFilePath);

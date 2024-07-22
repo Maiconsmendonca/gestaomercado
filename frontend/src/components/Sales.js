@@ -48,19 +48,26 @@ const Sales = () => {
                 <thead>
                 <tr>
                     <th className="border px-4 py-2">ID</th>
-                    <th className="border px-4 py-2">Date</th>
-                    <th className="border px-4 py-2">Total Amount</th>
+                    <th className="border px-4 py-2">Items Count</th>
+                    <th className="border px-4 py-2">Total Without Taxes</th>
+                    <th className="border px-4 py-2">Total Taxes</th>
+                    <th className="border px-4 py-2">Total With Taxes</th>
+                    <th className="border px-4 py-2">Sale Date</th>
                     <th className="border px-4 py-2">Actions</th>
                 </tr>
                 </thead>
                 <tbody>
-                {sales.map(sale => (
+                {Array.isArray(sales) && sales.map(sale => (
                     <tr key={sale.id}>
                         <td className="border px-4 py-2">{sale.id}</td>
+                        <td className="border px-4 py-2">{sale.items_count}</td>
+                        <td className="border px-4 py-2">${sale.total_sale_without_taxes}</td>
+                        <td className="border px-4 py-2">${sale.total_taxes || '0.00'}</td>
+                        <td className="border px-4 py-2">${sale.total_sale_with_taxes || '0.00'}</td>
                         <td className="border px-4 py-2">{sale.date}</td>
-                        <td className="border px-4 py-2">${sale.total_amount}</td>
                         <td className="border px-4 py-2">
-                            <Link to={`/sales/edit/${sale.id}`} className="bg-yellow-500 text-white py-1 px-2 rounded">Edit</Link>
+                            <Link to={`/sales/${sale.id}/edit`}
+                                  className="bg-yellow-500 text-white py-1 px-2 rounded">Edit</Link>
                             <button
                                 onClick={() => handleDelete(sale.id)}
                                 className="bg-red-500 text-white py-1 px-2 rounded ml-2"

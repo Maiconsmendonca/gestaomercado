@@ -2,41 +2,52 @@
 
 namespace App\Models;
 
-class ProductType
-{
+/**
+ *
+ */
+class ProductType {
+    /**
+     * @var mixed|null
+     */
     private $id;
+    /**
+     * @var mixed|null
+     */
     private $name;
-    private $taxPorcentage;
+    /**
+     * @var mixed|null
+     */
+    private $taxPercentage;
 
-    public function __construct(array $data) {
-        $this->id = $data['id'] ?? null;
-        $this->name = $data['name'] ?? '';
-        $this->taxPorcentage = $data['taxPorcentage'] ?? 0;
+    /**
+     * @param $data
+     */
+    public function __construct($data = null) {
+        if ($data) {
+            $this->id = $data['id'] ?? null;
+            $this->name = $data['name'] ?? null;
+            $this->taxPercentage = $data['tax_percentage'] ?? null;
+        }
     }
 
-    // ID
+    /**
+     * @return mixed|null
+     */
     public function getId() {
         return $this->id;
     }
 
-    public function setId($id) {
-        $this->id = $id;
-    }
-
-    // Name
+    /**
+     * @return mixed|null
+     */
     public function getName() {
         return $this->name;
     }
 
-    public function setName($name) {
-        $this->name = $name;
-    }
-
-    public function getTaxPorcentage() {
-        return $this->taxPorcentage;
-    }
-
-    public function setTaxPorcentage($taxPorcentage) {
-        $this->taxPorcentage = $taxPorcentage;
+    /**
+     * @return mixed|null
+     */
+    public function getTaxPercentage() {
+        return $this->taxPercentage;
     }
 }

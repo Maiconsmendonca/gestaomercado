@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { createProduct, updateProduct, fetchProductById, fetchProductTypes } from '../services/apiService';
+import { createProduct, updateProduct, fetchProductById, fetchProductTypes, fetchCategoryById } from '../services/apiService';
 
 const AddProduct = () => {
     const [productData, setProductData] = useState({
         name: '',
-        price: '',
-        product_type: ''
+        productTypeId: '',
+        price: ''
     });
     const [productTypes, setProductTypes] = useState([]);
     const [isEditing, setIsEditing] = useState(false);
     const [error, setError] = useState('');
 
     const navigate = useNavigate();
-    const { id } = useParams(); // Obtém o ID do produto da URL, se presente
+    const { id } = useParams();
 
     useEffect(() => {
         const loadProductData = async () => {
@@ -23,9 +23,9 @@ const AddProduct = () => {
                     setProductData({
                         name: data.name,
                         price: data.price,
-                        product_type: data.product_type
+                        productTypeId: data.category || ''
                     });
-                    setIsEditing(true); // Define como edição quando um ID está presente
+                    setIsEditing(true);
                 } catch (error) {
                     console.error('Error fetching product data:', error);
                 }
@@ -35,7 +35,7 @@ const AddProduct = () => {
         const loadProductTypes = async () => {
             try {
                 const response = await fetchProductTypes();
-                setProductTypes(response.data);
+                setProductTypes(response);
             } catch (error) {
                 console.error('Error fetching product types:', error);
             }
@@ -44,6 +44,26 @@ const AddProduct = () => {
         loadProductData();
         loadProductTypes();
     }, [id]);
+
+    useEffect(() => {
+        const updateSelectedProductType = async () => {
+            if (productData.productTypeId) {
+                try {
+                    const category = await fetchCategoryById(productData.productTypeId);
+                    if (category) {
+                        setProductData(prevState => ({
+                            ...prevState,
+                            productTypeId: category.id
+                        }));
+                    }
+                } catch (error) {
+                    console.error('Error fetching category by ID:', error);
+                }
+            }
+        };
+
+        updateSelectedProductType();
+    }, [productData.productTypeId]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -72,7 +92,8 @@ const AddProduct = () => {
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-xl font-bold mb-4 text-center">{isEditing ? 'Update Product' : 'Add Product'}</h1>
-            <form onSubmit={handleSubmit} className="bg-white p-6 border border-gray-200 rounded shadow-md max-w-lg mx-auto">
+            <form onSubmit={handleSubmit}
+                  className="bg-white p-6 border border-gray-200 rounded shadow-md max-w-lg mx-auto">
                 <div className="mb-4">
                     <label className="block text-gray-700">Name</label>
                     <input
@@ -84,32 +105,11 @@ const AddProduct = () => {
                         required
                     />
                 </div>
-                <div className="mb-4 relative">
-                    <label className="block text-gray-700">Price</label>
-                    <div className="relative">
-                        <input
-                            type="number"
-                            name="price"
-                            value={productData.price}
-                            onChange={handleChange}
-                            className="mt-1 block w-full pl-12 border-b border-gray-300 rounded-none focus:outline-none focus:ring-0"
-                            step="0.01"
-                            min="0" // Impede valores negativos
-                            inputMode="decimal"
-                            style={{
-                                appearance: 'none', // Remove as setas de incremento/decremento
-                                MozAppearance: 'textfield', // Remove as setas no Firefox
-                            }}
-                            required
-                        />
-                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
-                    </div>
-                </div>
                 <div className="mb-4">
-                    <label className="block text-gray-700">Product Type</label>
+                    <label className="block text-gray-700">Category</label>
                     <select
-                        name="product_type"
-                        value={productData.product_type}
+                        name="productTypeId"
+                        value={productData.productTypeId}
                         onChange={handleChange}
                         className="mt-1 block w-full border-b border-gray-300 rounded-none bg-white focus:outline-none"
                         required
@@ -121,6 +121,27 @@ const AddProduct = () => {
                             </option>
                         ))}
                     </select>
+                </div>
+                <div className="mb-4 relative">
+                    <label className="block text-gray-700">Price</label>
+                    <div className="relative">
+                        <input
+                            type="number"
+                            name="price"
+                            value={productData.price}
+                            onChange={handleChange}
+                            className="mt-1 block w-full pl-12 border-b border-gray-300 rounded-none focus:outline-none focus:ring-0"
+                            step="0.01"
+                            min="0"
+                            inputMode="decimal"
+                            style={{
+                                appearance: 'none',
+                                MozAppearance: 'textfield',
+                            }}
+                            required
+                        />
+                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
+                    </div>
                 </div>
                 {error && <p className="text-red-500 mb-4">{error}</p>}
                 <button

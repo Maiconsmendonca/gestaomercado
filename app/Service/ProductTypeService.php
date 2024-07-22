@@ -4,16 +4,29 @@ namespace App\Service;
 
 use App\Models\ProductType;
 use App\Repository\ProductTypeRepository;
+use function PHPUnit\Framework\exactly;
 
+/**
+ *
+ */
 class ProductTypeService
 {
+    /**
+     * @var ProductTypeRepository
+     */
     private ProductTypeRepository $productTypeRepository;
 
+    /**
+     * @param $productTypeRepository
+     */
     public function __construct($productTypeRepository)
     {
         $this->productTypeRepository = $productTypeRepository;
     }
 
+    /**
+     * @return array
+     */
     public function getAllProductTypes()
     {
         $productTypesFromRepo = $this->productTypeRepository->getAll();
@@ -24,7 +37,7 @@ class ProductTypeService
             $productTypesData[] = [
                 'id' => $productType->getId(),
                 'name' => $productType->getName(),
-                'taxPorcentage' => $productType->getTaxPorcentage()
+                'taxPercentage' => $productType->getTaxPercentage()
             ];
         }
 
@@ -32,6 +45,10 @@ class ProductTypeService
 
     }
 
+    /**
+     * @param $id
+     * @return array|null
+     */
     public function getProductTypeById($id)
     {
         $productType = $this->productTypeRepository->getById($id);
@@ -42,25 +59,40 @@ class ProductTypeService
         return [
             'id' => $productType->getId(),
             'name' => $productType->getName(),
-            'taxPorcentage' => $productType->getTaxPorcentage()
+            'tax_percentage' => $productType->getTaxPercentage()
         ];
     }
 
-    public function createProductType($name, $taxPorcentage)
+    /**
+     * @param $name
+     * @param $taxPercentage
+     * @return void
+     */
+    public function createProductType($name, $taxPercentage)
     {
         $productTypeData = [
             'name' => $name,
-            'taxPorcentage' => $taxPorcentage,
+            'tax_percentage' => $taxPercentage,
         ];
         $productType = new ProductType($productTypeData);
+
         $this->productTypeRepository->insertProductType($productType);
     }
 
+    /**
+     * @param $id
+     * @param $fields
+     * @return bool
+     */
     public function updateProductType($id, $fields)
     {
         return $this->productTypeRepository->update($id, $fields);
     }
 
+    /**
+     * @param $id
+     * @return bool
+     */
     public function deleteProductType($id)
     {
         return $this->productTypeRepository->delete($id);

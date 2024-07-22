@@ -10,7 +10,7 @@ Certifique-se de ter os seguintes requisitos instalados na sua máquina:
 
 - Docker
 - Docker Compose
-- PHP (opcional, dependendo das necessidades específicas do desenvolvimento)
+- PHP 8.3
 
 ### Passos Iniciais
 
@@ -26,23 +26,13 @@ Certifique-se de ter os seguintes requisitos instalados na sua máquina:
 
 2. **Configuração do Ambiente com Docker**
 
-Execute o Docker Compose para configurar e iniciar os serviços necessários:
+Execute o Docker Compose para configurar e iniciar o serviço de mysql (opcional se acaso nao tiver um servidor mysql instalado):
     
 ```bash
     docker compose up -d
 ```
 
-Isso criará e iniciará os containers Docker para PHP, Nginx, MySQL e Node.js.
-
-3. **Instalando Dependências PHP com Composer**
-
-Acesse o container PHP para instalar as dependências PHP usando o Composer:
-
-```bash
-docker compose exec php composer install
-```
-
-4. **Configurando o Arquivo `.env`**
+3. **Configurando o Arquivo `.env`**
 
 Copie o arquivo `.env-example` para `.env` e ajuste conforme necessário:
 
@@ -50,7 +40,16 @@ Copie o arquivo `.env-example` para `.env` e ajuste conforme necessário:
 cp .env-example .env
 ```
 
+4. **Iniciando servidor php**
+
+Execute o seguinte comando para iniciar o servidor PHP:
+
+```bash
+php -S localhost:8000
+```
+
 Edite o arquivo `.env` para configurar as variáveis de ambiente conforme seu ambiente local e de desenvolvimento.
+Em DB_HOST coloque o ip ou nome do seu servidor mysql, se for o container docker coloque o ip.
 
 5. **Gerando a Chave de Aplicativo**
 
@@ -62,11 +61,27 @@ php ./scripts/generate_key.php
 
 Este comando gera uma chave de 32 bytes e a adiciona automaticamente ao seu arquivo .env.
 
-### Usando o Sistema
+### Configurando o frontend
 
-Depois de configurar o ambiente conforme acima,
-você pode acessar o sistema através do navegador usando:
-http://localhost.
+Para configurar o frontend, você precisa instalar as dependências do Node.js e compilar os arquivos de frontend.
+
+1. **Instalando Dependências**
+
+   Instale as dependências do Node.js executando o seguinte comando dentro da pasta gestaomercado/frontend:
+
+   ```bash
+   npm install
+   ```
+
+2. **Iniciando servidor Node**
+
+    Inicie o servidor Node.js executando o seguinte comando dentro da pasta gestaomercado/frontend:
+    
+    ```bash
+    npm run serve
+    ```
+    
+    O servidor Node.js será iniciado e você poderá acessar o frontend através do navegador em http://localhost:8080.
 
 ### Parando os Serviços
 
@@ -86,3 +101,36 @@ navegue até o diretório do seu projeto e execute:
 php setup_database.php
 ```
 
+ou voce pode copiar as queries do arquivo setup_database.sql e executar no seu banco de dados.
+
+### Endpoints para api
+
+se quiser acessar os endpoints e testar a api segue os endpoints:
+
+# Gestão Mercado API
+
+## Product
+
+### Listar Todos Produtos
+
+- **Método:** `GET`
+- **URL:** `http://localhost:8080/api/product`
+
+### Obter Detalhes de um Produto Específico
+
+- **Método:** `GET`
+- **URL:** `http://localhost:8080/api/product/{id}`
+
+### Criar um Novo Produto
+
+- **Método:** `POST`
+- **URL:** `http://localhost:8080/api/product`
+- **Request Headers:**
+   - `Content-Type: application/json`
+- **Request Body:**
+  ```json
+  {
+    "name": "Produto um",
+    "productTypeId": 1,
+    "price": 80.90
+  }

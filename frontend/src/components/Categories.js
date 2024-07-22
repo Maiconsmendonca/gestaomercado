@@ -49,7 +49,7 @@ const Categories = () => {
                     <tr key={category.id}>
                         <td className="border px-4 py-2">{category.id}</td>
                         <td className="border px-4 py-2">{category.name}</td>
-                        <td className="border px-4 py-2">{category.tax_percentage}%</td>
+                        <td className="border px-4 py-2">{category.taxPercentage}%</td>
                         <td className="border px-4 py-2">
                             <Link to={`/categories/${category.id}/edit`}>
                                 <button className="bg-yellow-500 text-white py-1 px-2 rounded">Edit</button>

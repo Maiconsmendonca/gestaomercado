@@ -36,7 +36,7 @@
     transform: rotate(360deg);
   }
 }
-/* Adicione isso no seu arquivo CSS global ou no componente */
+
 .relative {
   position: relative;
 }
@@ -46,7 +46,7 @@
 }
 
 .pl-16 {
-  padding-left: 4rem; /* Ajuste conforme necessário */
+  padding-left: 4rem;
 }
 
 .mt-1 {
@@ -62,7 +62,7 @@
 }
 
 .rounded {
-  border-radius: 0.375rem; /* Ajuste conforme necessário */
+  border-radius: 0.375rem;
 }
 
 .border-gray-300 {

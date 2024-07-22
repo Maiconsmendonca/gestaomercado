@@ -53,7 +53,6 @@ const LayoutBase = ({ cards }) => {
                     overflow: 'auto',
                     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
                 }}>
-                    {/* Mostrar os Cards apenas na página inicial */}
                     <div className="dashboard flex flex-wrap justify-center items-start gap-4">
                         {window.location.pathname === '/' && cards}
                     </div>

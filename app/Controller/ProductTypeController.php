@@ -5,10 +5,19 @@ namespace App\Controller;
 use App\Repository\ProductTypeRepository;
 use App\Service\ProductTypeService;
 
+/**
+ *
+ */
 class ProductTypeController
 {
+    /**
+     * @var ProductTypeService
+     */
     private ProductTypeService $productTypeService;
 
+    /**
+     *
+     */
     public function __construct()
     {
         $productTypeRepository = new ProductTypeRepository();
@@ -16,6 +25,9 @@ class ProductTypeController
         $this->productTypeService = new ProductTypeService($productTypeRepository);
     }
 
+    /**
+     * @return void
+     */
     public function index()
     {
         $productTypes = $this->productTypeService->getAllProductTypes();
@@ -23,6 +35,10 @@ class ProductTypeController
         echo json_encode($productTypes);
     }
 
+    /**
+     * @param $id
+     * @return void
+     */
     public function show($id)
     {
         $productType = $this->productTypeService->getProductTypeById($id);
@@ -37,6 +53,9 @@ class ProductTypeController
         echo json_encode($productType);
     }
 
+    /**
+     * @return void
+     */
     public function store()
     {
         $inputJSON = file_get_contents('php://input');
@@ -49,11 +68,11 @@ class ProductTypeController
         }
 
         $name = $input['name'] ?? null;
-        $taxPorcentage = $input['taxPorcentage'] ?? null;
+        $taxPercentage = $input['tax_percentage'] ?? null;
 
-        if ($name && $taxPorcentage) {
+        if ($name && $taxPercentage) {
             try {
-                $this->productTypeService->createProductType($name, $taxPorcentage);
+                $this->productTypeService->createProductType($name, $taxPercentage);
                 http_response_code(201);
                 echo json_encode(['message' => 'Tipo de produto adicionado com sucesso.']);
             } catch (\Exception $e) {
@@ -66,6 +85,10 @@ class ProductTypeController
         }
     }
 
+    /**
+     * @param $id
+     * @return void
+     */
     public function update($id)
     {
         $inputJSON = file_get_contents('php://input');
@@ -87,6 +110,10 @@ class ProductTypeController
         }
     }
 
+    /**
+     * @param $id
+     * @return void
+     */
     public function destroy($id)
     {
         $deleted = $this->productTypeService->deleteProductType($id);

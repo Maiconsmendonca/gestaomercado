@@ -7,10 +7,19 @@ use function PHPUnit\Framework\exactly;
 
 require_once __DIR__ . '/../../config.php';
 
+/**
+ *
+ */
 class database
 {
+    /**
+     * @var null
+     */
     private static $instance = null;
 
+    /**
+     * @return PDO|null
+     */
     public static function getInstance()
     {
 

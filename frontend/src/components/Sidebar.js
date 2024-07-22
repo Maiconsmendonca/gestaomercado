@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const Sidebar = ({ isOpen, onClose }) => {
-    if (!isOpen) return null; // Se o sidebar não estiver aberto, não renderize nada.
+    if (!isOpen) return null;
 
     return (
         <div className="fixed top-0 left-0 h-full w-64 bg-gray-800 bg-opacity-80 text-white shadow-lg transition-transform transform" style={{ transform: isOpen ? 'translateX(0)' : 'translateX(-100%)' }}>

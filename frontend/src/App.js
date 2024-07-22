@@ -16,8 +16,8 @@ function App() {
                 <Route path="/" element={<LayoutBase />}>
                     <Route index element={<Dashboard />} />
                     <Route path="products" element={<Products />} />
-                    <Route path="products/add" element={<AddOrUpdateProduct />} /> {/* Rota para adicionar produtos */}
-                    <Route path="products/:id/edit" element={<AddOrUpdateProduct />} /> {/* Rota para editar produtos */}
+                    <Route path="products/add" element={<AddOrUpdateProduct />} />
+                    <Route path="products/:id/edit" element={<AddOrUpdateProduct />} />
                     <Route path="sales" element={<Sales />} />
                     <Route path="categories" element={<Categories />} />
                     <Route path="categories/add" element={<AddOrUpdateCategory />} />

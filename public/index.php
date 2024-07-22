@@ -1,6 +1,6 @@
 <?php
 
-use App\RouterConfig as Router;
+use App\config\router as Router;
 
 require_once __DIR__.'/../vendor/autoload.php';
 

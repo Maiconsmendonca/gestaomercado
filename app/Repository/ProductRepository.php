@@ -8,20 +8,33 @@ use http\Env\Request;
 use PDO;
 use PDOException;
 
+/**
+ *
+ */
 class ProductRepository
 {
+    /**
+     * @var PDO|null
+     */
     private $pdo;
 
+    /**
+     *
+     */
     public function __construct()
     {
         $this->pdo = Database::getInstance();
     }
 
+    /**
+     * @param $id
+     * @return Product|void|null
+     */
     public function getById($id)
     {
         try {
             $stmt = $this->pdo->prepare("
-                        SELECT products.*, product_types.tax_porcentage
+                        SELECT products.*, product_types.tax_percentage
                         FROM products 
                         JOIN product_types ON products.productTypeId = product_types.id 
                         WHERE products.id = :id");
@@ -38,11 +51,14 @@ class ProductRepository
         }
     }
 
+    /**
+     * @return array|void
+     */
     public function getAll()
     {
         try {
             $stmt = $this->pdo->query(
-                "SELECT products.id, products.name, products.price, product_types.tax_porcentage, products.productTypeId
+                "SELECT products.id, products.name, products.price, product_types.tax_percentage, products.productTypeId
             FROM products
             JOIN product_types ON products.productTypeId = product_types.id
             WHERE products.deleted_at IS NULL;");
@@ -63,6 +79,10 @@ class ProductRepository
         }
     }
 
+    /**
+     * @param Product $product
+     * @return void
+     */
     public function insertProduct(Product $product): void
     {
 
@@ -78,6 +98,11 @@ class ProductRepository
         }
     }
 
+    /**
+     * @param $id
+     * @param $fields
+     * @return bool
+     */
     public function update($id, $fields)
     {
         $sqlParts = [];
@@ -104,6 +129,10 @@ class ProductRepository
         }
     }
 
+    /**
+     * @param $id
+     * @return bool
+     */
     public function delete($id)
     {
         $sql = "UPDATE products SET deleted_at = NOW() WHERE id = ?";

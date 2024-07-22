@@ -7,31 +7,27 @@ use App\Models\ProductType;
 use PDO;
 use PDOException;
 
+/**
+ *
+ */
 class ProductTypeRepository
 {
+    /**
+     * @var PDO|null
+     */
     private $pdo;
 
+    /**
+     *
+     */
     public function __construct()
     {
         $this->pdo = Database::getInstance();
     }
 
-//    public function add(ProductType $productType)
-//    {
-//        $db = Database::getInstance();
-//        $stmt = $db->prepare("INSERT INTO product_types (name) VALUES (?)");
-//        $stmt->execute([$productType->name]);
-//    }
-//
-//    public function getProductTypeById($id)
-//    {
-//        $pdo = Database::getConnection();
-//        $stmt = $pdo->prepare("SELECT * FROM product_types WHERE id = :id");
-//        $stmt->execute(['id' => $id]);
-//        $row = $stmt->fetch();
-//        return new ProductType($row['id'], $row['name'], $row['tax_porcentage']);
-//    }
-
+    /**
+     * @return array
+     */
     public function getAll()
     {
         try {
@@ -54,6 +50,10 @@ class ProductTypeRepository
         }
     }
 
+    /**
+     * @param $id
+     * @return ProductType|void|null
+     */
     public function getById($id)
     {
         try {
@@ -71,13 +71,17 @@ class ProductTypeRepository
         }
     }
 
+    /**
+     * @param ProductType $productType
+     * @return void
+     */
     public function insertProductType(ProductType $productType)
     {
-        $sql = "INSERT INTO product_types (name, tax_porcentage) VALUES (?, ?)";
+        $sql = "INSERT INTO product_types (name, tax_percentage) VALUES (?, ?)";
 
         try {
             $stmt = Database::getInstance()->prepare($sql);
-            $stmt->execute([$productType->getName(), $productType->getTaxPorcentage()]);
+            $stmt->execute([$productType->getName(), $productType->getTaxPercentage()]);
             $productTypeId = Database::getInstance()->lastInsertId();
             $productType->setId($productTypeId);
         } catch (PDOException $e) {
@@ -85,14 +89,17 @@ class ProductTypeRepository
         }
     }
 
+    /**
+     * @param $id
+     * @param $fields
+     * @return bool
+     */
     public function update($id, $fields)
     {
         $sqlParts = [];
         $values = [];
-        // Mapeamento de campos camelCase para snake_case
         $fieldMapping = [
-            'taxPorcentage' => 'tax_porcentage',
-            // Adicione mais mapeamentos conforme necessário
+            'taxPercentage' => 'tax_percentage',
         ];
 
         foreach ($fields as $key => $value) {
@@ -117,6 +124,10 @@ class ProductTypeRepository
         }
     }
 
+    /**
+     * @param $id
+     * @return bool
+     */
     public function delete($id)
     {
         $sql = "UPDATE product_types SET deleted_at = NOW() WHERE id = ?";

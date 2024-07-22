@@ -5,22 +5,38 @@ use App\Service\ProductService;
 use App\Repository\ProductRepository;
 use http\Client\Request;
 
+/**
+ *
+ */
 class ProductController {
+    /**
+     * @var ProductService
+     */
     private ProductService $productService;
 
+    /**
+     *
+     */
     public function __construct() {
         $productRepository = new ProductRepository();
         $this->productService = new ProductService($productRepository);
     }
 
-    public function index()
+    /**
+     * @return void
+     */
+    public function index(): void
     {
         $products = $this->productService->getAllProducts();
         header('Content-Type: application/json');
         echo json_encode($products);
     }
 
-    public function show($id)
+    /**
+     * @param $id
+     * @return void
+     */
+    public function show($id): void
     {
         $product = $this->productService->getProductById($id);
 
@@ -34,7 +50,10 @@ class ProductController {
         echo json_encode($product);
     }
 
-    public function store()
+    /**
+     * @return void
+     */
+    public function store(): void
     {
         $inputJSON = file_get_contents('php://input');
         $input = json_decode($inputJSON, true);
@@ -64,7 +83,11 @@ class ProductController {
         }
     }
 
-    public function update($id)
+    /**
+     * @param $id
+     * @return void
+     */
+    public function update($id): void
     {
         $inputJSON = file_get_contents('php://input');
         $input = json_decode($inputJSON, true);
@@ -85,7 +108,11 @@ class ProductController {
         }
     }
 
-    public function destroy($id)
+    /**
+     * @param $id
+     * @return void
+     */
+    public function destroy($id): void
     {
         $deleted = $this->productService->deleteProduct($id);
 

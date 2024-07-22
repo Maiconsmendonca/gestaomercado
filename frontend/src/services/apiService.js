@@ -1,19 +1,19 @@
-import api from './axios'; // Importe a instância do axios
+import api from './axios';
 
 // Funções para "Products"
-const fetchProduct = async (id) => {
+export const fetchProducts = async () => {
     try {
-        const response = await api.get(`/products/${id}`);
+        const response = await api.get('/product');
         return response.data;
     } catch (error) {
-        console.error('Error fetching product:', error);
+        console.error('Error fetching products:', error);
         throw error;
     }
 };
 
-const createProduct = async (productData) => {
+export const createProduct = async (productData) => {
     try {
-        const response = await api.post('/products', productData);
+        const response = await api.post('/product', productData);
         return response.data;
     } catch (error) {
         console.error('Error creating product:', error);
@@ -21,9 +21,9 @@ const createProduct = async (productData) => {
     }
 };
 
-const updateProduct = async (id, productData) => {
+export const updateProduct = async (id, productData) => {
     try {
-        const response = await api.put(`/products/${id}`, productData);
+        const response = await api.put(`/product/${id}`, productData);
         return response.data;
     } catch (error) {
         console.error('Error updating product:', error);
@@ -31,17 +31,16 @@ const updateProduct = async (id, productData) => {
     }
 };
 
-const deleteProduct = async (id) => {
+export const deleteProduct = async (id) => {
     try {
-        await api.delete(`/products/${id}`);
+        await api.delete(`/product/${id}`);
     } catch (error) {
         console.error('Error deleting product:', error);
         throw error;
     }
 };
 
-// Funções para "Dashboard"
-const fetchDashboardData = async () => {
+export const fetchDashboardData = async () => {
     try {
         const response = await api.get('/dashboard'); // Ajuste a URL conforme a sua API
         return response.data;
@@ -51,10 +50,9 @@ const fetchDashboardData = async () => {
     }
 };
 
-// Função para "Product Types"
-const fetchProductTypes = async () => {
+export const fetchProductTypes = async () => {
     try {
-        const response = await api.get('/product-types');
+        const response = await api.get('/product-type');
         return response.data;
     } catch (error) {
         console.error('Error fetching product types:', error);
@@ -62,10 +60,9 @@ const fetchProductTypes = async () => {
     }
 };
 
-// Função para buscar um produto pelo ID
-const fetchProductById = async (id) => {
+export const fetchProductById = async (id) => {
     try {
-        const response = await api.get(`/products/${id}`);
+        const response = await api.get(`/product/${id}`);
         return response.data;
     } catch (error) {
         console.error('Error fetching product by ID:', error);
@@ -73,14 +70,19 @@ const fetchProductById = async (id) => {
     }
 };
 
-// Funções para "Categories"
-const fetchCategories = async () => {
-    return api.get('/categories');
+export const fetchCategories = async () => {
+    try {
+        const response = await api.get('/product-type');
+        return response.data;
+    } catch (error) {
+        console.error('Failed to fetch categories:', error);
+        throw error;
+    }
 };
 
-const fetchCategoryById = async (id) => {
+export const fetchCategoryById = async (id) => {
     try {
-        const response = await api.get(`/categories/${id}`);
+        const response = await api.get(`/product-type/${id}`);
         return response.data;
     } catch (error) {
         console.error('Error fetching category by ID:', error);
@@ -88,67 +90,47 @@ const fetchCategoryById = async (id) => {
     }
 };
 
-const createCategory = async (categoryData) => {
-    return api.post('/categories', categoryData);
+export const createCategory = async (categoryData) => {
+    return api.post('/product-type', categoryData);
 };
 
-const updateCategory = async (id, categoryData) => {
-    return api.put(`/categories/${id}`, categoryData);
+export const updateCategory = async (id, categoryData) => {
+    return api.put(`/product-type/${id}`, categoryData);
 };
 
-const deleteCategory = async (id) => {
-    return api.delete(`/categories/${id}`);
+export const deleteCategory = async (id) => {
+    return api.delete(`/product-type/${id}`);
 };
 
-// Funções para "Sales"
-const fetchSales = async () => {
-    return api.get('/sales');
-};
-
-const fetchSaleById = async (id) => {
+export const fetchSales = async () => {
     try {
-        const response = await api.get(`/sales/${id}`);
+        const response = await api.get('/sales');
         return response.data;
     } catch (error) {
-        console.error('Error fetching sale by ID:', error);
+        console.error('Failed to fetch sales', error);
         throw error;
     }
 };
 
-const createSale = async (saleData) => {
+
+export const fetchSaleById = async (saleId) => {
+    try {
+        const response = await api.get(`/sales/${saleId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Failed to fetch sale details', error);
+        throw error;
+    }
+};
+
+export const createSale = async (saleData) => {
     return api.post('/sales', saleData);
 };
 
-const updateSale = async (id, saleData) => {
+export const updateSale = async (id, saleData) => {
     return api.put(`/sales/${id}`, saleData);
 };
 
-const deleteSale = async (id) => {
+export const deleteSale = async (id) => {
     return api.delete(`/sales/${id}`);
-};
-
-// Função para "Products"
-const fetchProducts = async () => {
-    return api.get('/products');
-};
-
-// Exporta as funções para serem utilizadas nos components
-export {
-    fetchProduct,
-    createProduct,
-    updateProduct,
-    deleteProduct,
-    fetchDashboardData,
-    fetchProductTypes,
-    fetchProductById,
-    fetchCategories,
-    fetchCategoryById,
-    createCategory,
-    updateCategory,
-    deleteCategory,
-    fetchSales,
-    fetchSaleById,
-    createSale,
-    updateSale,
-    deleteSale
 };

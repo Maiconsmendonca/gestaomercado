@@ -1,9 +1,6 @@
-# Use a imagem do PHP com Apache
 FROM php:8.4-apache
 
-# Instale dependências do sistema e pacotes de desenvolvimento necessários
 RUN apt-get update && apt-get install -y \
-    # Pacotes essenciais para o sistema
     build-essential \
     libpng-dev \
     libjpeg-dev \
@@ -23,14 +20,11 @@ RUN apt-get update && apt-get install -y \
     libicu-dev \
     libssl-dev \
     zlib1g-dev \
-    # Outros pacotes necessários para o Apache e PHP
     apache2 \
     && rm -rf /var/lib/apt/lists/*
 
-# Habilitar módulos do Apache
 RUN a2enmod rewrite
 
-# Configuração do Apache para suportar reescrita de URLs e definir DocumentRoot
 RUN echo '<VirtualHost *:80>\n\
     ServerName localhost\n\
     DocumentRoot /var/www/html/public\n\
@@ -50,42 +44,32 @@ RUN echo '<VirtualHost *:80>\n\
     RewriteRule ^ /index.php [L]\n\
 </VirtualHost>' > /etc/apache2/sites-available/000-default.conf
 
-# Limpar cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Instalação do Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Copiar arquivos do Composer
 COPY composer.json /var/www/html/public/composer.json
 COPY composer.lock /var/www/html/public/composer.lock
 
-# Set working directory
 WORKDIR /var/www/html/public
 
-# Instalação de extensões PHP
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install gd \
     && docker-php-ext-install pdo_mysql pdo_pgsql pdo_sqlite mbstring exif pcntl bcmath opcache zip soap xml curl
 
-# Instalação do Xdebug (opcional)
 RUN pecl install xdebug \
     && docker-php-ext-enable xdebug \
     && echo "xdebug.mode=debug" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && echo "xdebug.start_with_request=yes" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && echo "xdebug.client_host=host.docker.internal" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
-# Configurações personalizadas do php.ini
 RUN echo "date.timezone = America/Sao_Paulo" >> /usr/local/etc/php/conf.d/docker-php.ini \
     && echo "memory_limit = 512M" >> /usr/local/etc/php/conf.d/docker-php.ini \
     && echo "upload_max_filesize = 100M" >> /usr/local/etc/php/conf.d/docker-php.ini \
     && echo "post_max_size = 100M" >> /usr/local/etc/php/conf.d/docker-php.ini
 
-# Instalar dependências do Composer
 RUN composer install --no-dev --optimize-autoloader
 
-# Expose port 80 do Apache
 EXPOSE 80
 
-# Start Apache
 CMD ["apache2-foreground"]

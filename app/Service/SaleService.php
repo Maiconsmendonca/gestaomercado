@@ -10,13 +10,33 @@ use Exception;
 use PDOException;
 use function PHPUnit\Framework\exactly;
 
+/**
+ *
+ */
 class SaleService
 {
+    /**
+     * @var SaleRepository
+     */
     protected $saleRepository;
+    /**
+     * @var ProductService
+     */
     protected $productService;
+    /**
+     * @var ProductTypeService
+     */
     protected $productTypeService;
+    /**
+     * @var
+     */
     private $saleItemRepository;
 
+    /**
+     * @param SaleRepository $saleRepository
+     * @param ProductService $productService
+     * @param ProductTypeService $productTypeService
+     */
     public function __construct(SaleRepository $saleRepository, ProductService $productService, ProductTypeService $productTypeService)
     {
         $this->saleRepository = $saleRepository;
@@ -24,6 +44,11 @@ class SaleService
         $this->productTypeService = $productTypeService;
     }
 
+    /**
+     * @param $data
+     * @return void
+     * @throws Exception
+     */
     public function createSale($data)
     {
         $items = [];
@@ -34,17 +59,35 @@ class SaleService
                 throw new Exception('Produto não encontrado');
             }
 
-            $items[] = new SaleItem($itemData['product_id'], $itemData['quantity'], $product['price'], $product['taxPorcentage']);
+            $items[] = new SaleItem($itemData['product_id'], $itemData['quantity'], $product['price'], $product['taxPercentage']);
         }
         $saleId = $this->saleRepository->createSale($items);
         $this->saleItemRepository->createSaleItem($saleId, $items);
     }
 
+    /**
+     * @return array
+     */
     public function getAllSales()
     {
-        return $this->saleRepository->getAllSales();
+        try {
+            $salesData = $this->saleRepository->getAllSales();
+            return [
+                'data' => $salesData,
+                'success' => true
+            ];
+        } catch (\Exception $e) {
+            return [
+                'data' => [],
+                'success' => false,
+                'message' => $e->getMessage()
+            ];
+        }
     }
 
+    /**
+     * @return array
+     */
     public function calculateTotals()
     {
         $sales = $this->saleRepository->getAllSales();
@@ -65,6 +108,11 @@ class SaleService
         ];
     }
 
+    /**
+     * @param $saleId
+     * @return array
+     * @throws Exception
+     */
     public function getSaleDetails($saleId)
     {
         try {
@@ -76,7 +124,7 @@ class SaleService
             $totalSaleWithTaxes = 0;
 
             foreach ($saleData['saleDetails'] as $item) {
-                // Calcula a porcentagem de taxa e o valor da taxa sem multiplicação
+                // Calcula a Percentagem de taxa e o valor da taxa sem multiplicação
                 $taxPercentage = ($item['tax_amount'] / ($item['unit_price'] * $item['quantity'])) * 100;
                 $taxValue = $item['tax_amount'] / $item['quantity'];
 
@@ -85,6 +133,7 @@ class SaleService
                     'product_id' => $item['product_id'],
                     'product_name' => $item['product_name'],
                     'category_name' => $item['category_name'],
+                    'category_id' => $item['category_id'],
                     'quantity' => $item['quantity'],
                     'unit_price' => $item['unit_price'],
                     'tax_amount' => $item['tax_amount'],

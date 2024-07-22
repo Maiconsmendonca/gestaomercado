@@ -33,3 +33,7 @@ router::add('GET', '/taxes/{id}', 'TaxController@show');
 router::add('POST', '/taxes', 'TaxController@store');
 router::add('PUT', '/taxes/{id}', 'TaxController@update');
 router::add('DELETE', '/taxes/{id}', 'TaxController@destroy');
+
+
+// Rota Dashboard
+router::add('GET', '/dashboard', 'StatisticController@index');

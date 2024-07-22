@@ -11,7 +11,7 @@ const AddOrUpdateCategory = () => {
     const [error, setError] = useState('');
 
     const navigate = useNavigate();
-    const { id } = useParams(); // Obtém o ID da categoria da URL, se presente
+    const { id } = useParams();
 
     useEffect(() => {
         const loadCategoryData = async () => {
@@ -22,7 +22,7 @@ const AddOrUpdateCategory = () => {
                         name: data.name,
                         tax_percentage: data.tax_percentage
                     });
-                    setIsEditing(true); // Define como edição quando um ID está presente
+                    setIsEditing(true);
                 } catch (error) {
                     console.error('Error fetching category data:', error);
                 }
@@ -85,8 +85,8 @@ const AddOrUpdateCategory = () => {
                             step="0.01"
                             required
                             style={{
-                                appearance: 'none', // Remove as setas de incremento/decremento
-                                MozAppearance: 'textfield', // Remove as setas no Firefox
+                                appearance: 'none',
+                                MozAppearance: 'textfield',
                             }}
                         />
                         <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">%</span>

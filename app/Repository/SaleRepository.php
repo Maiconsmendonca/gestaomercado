@@ -7,6 +7,7 @@ use App\Helper\CalculateHelper;
 use App\Models\SaleItem;
 use App\Repository\SaleItemRepository;
 use Exception;
+use PDO;
 use PDOException;
 
 class SaleRepository
@@ -30,7 +31,7 @@ class SaleRepository
             $saleId = $this->pdo->lastInsertId();
 
             foreach ($saleData as $itemData) {
-                $tax = CalculateHelper::calculateTax($itemData->getTaxPorcentage(), $itemData->getPrice());
+                $tax = CalculateHelper::calculateTax($itemData->getTaxPercentage(), $itemData->getPrice());
                 $itemData->setTax($tax);
 
                 $taxAmount = CalculateHelper::calculateTotalTax($itemData->getTax(), $itemData->getQuantity());
@@ -86,6 +87,7 @@ class SaleRepository
                             'product_id' => $item['product_id'],
                             'product_name' => $item['product_name'],
                             'category_name' => $item['category_name'],
+                            'category_id' => $item['category_id'],
                             'quantity' => $item['quantity'],
                             'unit_price' => $item['unit_price'],
                             'tax_amount' => $item['tax_amount'],
@@ -103,5 +105,24 @@ class SaleRepository
             throw new Exception("Erro ao buscar venda: " . $e->getMessage());
         }
     }
+
+    public function getAllSales() {
+        $sql = "
+        SELECT 
+            s.id,
+            s.date,
+            COUNT(si.id) AS items_count,
+            SUM(si.unit_price * si.quantity) AS total_sale_without_taxes,
+            SUM(si.tax_amount) AS total_taxes,
+            SUM(si.total_amount) AS total_sale_with_taxes
+        FROM sales s
+        LEFT JOIN sale_items si ON s.id = si.sale_id
+        GROUP BY s.id, s.date
+    ";
+
+        $stmt = $this->pdo->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
 
 }

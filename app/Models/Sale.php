@@ -2,58 +2,130 @@
 
 namespace App\Models;
 
+/**
+ *
+ */
 class Sale
 {
+    /**
+     * @var
+     */
     private $id;
-    private $saleItemId;
-    private $taxAmount;
-    private $totalAmount;
+    /**
+     * @var
+     */
+    private $date;
+    /**
+     * @var
+     */
+    private $totalAmountWithoutTaxes;
+    /**
+     * @var
+     */
+    private $totalTaxAmount;
+    /**
+     * @var
+     */
+    private $totalAmountWithTaxes;
 
-    public function __construct($id, $saleItemId, $taxAmount, $totalAmount)
+    /**
+     * @param $id
+     * @param $date
+     * @param $totalAmountWithoutTaxes
+     * @param $totalTaxAmount
+     * @param $totalAmountWithTaxes
+     */
+    public function __construct($id, $date, $totalAmountWithoutTaxes, $totalTaxAmount, $totalAmountWithTaxes)
     {
         $this->id = $id;
-        $this->saleItemId = $saleItemId;
-        $this->taxAmount = $taxAmount;
-        $this->totalAmount = $totalAmount;
+        $this->date = $date;
+        $this->totalAmountWithoutTaxes = $totalAmountWithoutTaxes;
+        $this->totalTaxAmount = $totalTaxAmount;
+        $this->totalAmountWithTaxes = $totalAmountWithTaxes;
     }
 
+    /**
+     * @return mixed
+     */
     public function getId()
     {
         return $this->id;
     }
 
+    /**
+     * @param $id
+     * @return void
+     */
     public function setId($id)
     {
         $this->id = $id;
     }
 
-    public function getSaleItemId()
+    /**
+     * @return mixed
+     */
+    public function getDate()
     {
-        return $this->saleItemId;
+        return $this->date;
     }
 
-    public function setSaleItemId($saleItemId)
+    /**
+     * @param $date
+     * @return void
+     */
+    public function setDate($date)
     {
-        $this->saleItemId = $saleItemId;
+        $this->date = $date;
     }
 
-    public function getTaxAmount()
+    /**
+     * @return mixed
+     */
+    public function getTotalAmountWithoutTaxes()
     {
-        return $this->taxAmount;
+        return $this->totalAmountWithoutTaxes;
     }
 
-    public function setTaxAmount($taxAmount)
+    /**
+     * @param $totalAmountWithoutTaxes
+     * @return void
+     */
+    public function setTotalAmountWithoutTaxes($totalAmountWithoutTaxes)
     {
-        $this->taxAmount = $taxAmount;
+        $this->totalAmountWithoutTaxes = $totalAmountWithoutTaxes;
     }
 
-    public function getTotalAmount()
+    /**
+     * @return mixed
+     */
+    public function getTotalTaxAmount()
     {
-        return $this->totalAmount;
+        return $this->totalTaxAmount;
     }
 
-    public function setTotalAmount($totalAmount)
+    /**
+     * @param $totalTaxAmount
+     * @return void
+     */
+    public function setTotalTaxAmount($totalTaxAmount)
     {
-        $this->totalAmount = $totalAmount;
+        $this->totalTaxAmount = $totalTaxAmount;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTotalAmountWithTaxes()
+    {
+        return $this->totalAmountWithTaxes;
+    }
+
+    /**
+     * @param $totalAmountWithTaxes
+     * @return void
+     */
+    public function setTotalAmountWithTaxes($totalAmountWithTaxes)
+    {
+        $this->totalAmountWithTaxes = $totalAmountWithTaxes;
     }
 }

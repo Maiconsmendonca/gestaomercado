@@ -10,9 +10,9 @@ class TaxCalculatorService {
         $this->taxRepository = $taxRepository;
     }
 
-    public function calculateTax($taxPorcentage, $unitPrice, $quantity)
+    public function calculateTax($taxPercentage, $unitPrice, $quantity)
     {
-        $taxAmount = ($taxPorcentage / 100) * $unitPrice * $quantity;
+        $taxAmount = ($taxPercentage / 100) * $unitPrice * $quantity;
         return $taxAmount;
     }
 }

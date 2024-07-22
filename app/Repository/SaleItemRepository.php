@@ -27,7 +27,7 @@ class SaleItemRepository
                 $item->getQuantity(),
                 $item->getPrice(),
                 $item->getTax(),
-                $item->getTaxPorcentage(),
+                $item->getTaxPercentage(),
                 $item->getTaxAmount(),
                 $item->getTotalAmount(),
                 $item->getTotalAmountWhitTax(),
